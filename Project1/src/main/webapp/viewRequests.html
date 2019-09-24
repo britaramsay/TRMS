@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="ISO-8859-1">
+        <title>Insert title here</title>
+    </head>
+    <body>
+        <h3>Requests pending your approval</h3>
+        <div id="pendingForMe"></div>
+
+
+        <h3>Your requests awaiting approval</h3>
+
+        <h3>Your approved requests</h3>
+        <button>Add Grade if Completed</button>
+    </body>
+    <script>
+        getRequestsForApprovals();
+
+        function approve(r_id) {
+            console.log(r_id)
+        }
+
+        function getRequestsForApprovals () {
+            let xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function () {
+                console.log(this.status);
+                if(this.readyState == 4 && this.status == 200) {
+                    let requestsArray = JSON.parse(this.responseText);
+                    console.log(requestsArray);
+                    let reqRow = "";
+                    for(i = 0; i < requestsArray.length; i++) {
+                        reqRow += 
+                            `<tr>
+                                <td>
+                                    ${requestsArray[i]['reqEmployee']['firstname']}
+                                </td>
+                                <td>
+                                    ${requestsArray[i]['reqEmployee']['lastname']}
+                                </td>
+                                <td>
+                                    ${new Date(requestsArray[i]['event_id']['startDateTime']).toDateString()}
+                                </td>
+                                <td>
+                                    ${requestsArray[i]['event_id']['location']}
+                                </td>                                
+                                <td>
+                                    ${requestsArray[i]['event_id']['description']}
+                                </td>                                
+                                <td>
+                                    ${requestsArray[i]['event_id']['cost']}
+                                </td>                                
+                                <td>
+                                    ${requestsArray[i]['event_id']['type']}
+                                </td>                                
+                                <td>
+                                    ${requestsArray[i]['event_id']['reimbursement']}
+                                </td>                                
+                                <td>
+                                    ${requestsArray[i]['event_id']['gradingFormat']}
+                                </td>
+                                <td>
+                                    ${requestsArray[i]['event_id']['passingCuttoff']}
+                                </td>
+                                <td>
+                                    <button onclick="approve(${requestsArray[i]['r_id']})">Approve</button>
+                                </td>
+                            </tr>`;
+                            console.log(reqRow)
+                    }
+
+                    let reqInfo = 
+                            `<table>
+                                <tr>
+                                    <td>First Name</td>
+                                    <td>Last Name</td>
+                                    <td>Start Date/Time</td>
+                                    <td>Location</td>
+                                    <td>Description</td>
+                                    <td>Cost</td>
+                                    <td>Type</td>
+                                    <td>Reimbursement %</td>
+                                    <td>Grading Format</td>
+                                    <td>Passing Cut Off</td>
+                                </tr>
+                                ${reqRow}
+                            </table>`;
+
+                    document.getElementById("pendingForMe").innerHTML = reqInfo;
+                }
+            }
+
+            xhttp.open("GET", "http://localhost:8080/Project1/getRequestsToReview.do", true);
+            xhttp.send();
+        }
+    </script>
+</html>
